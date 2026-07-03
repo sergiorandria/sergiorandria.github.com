@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conception - Système de Réservation de Salles</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+            border-bottom: 5px solid var(--secondary-color);
+        }
+
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: -30px auto 3rem auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-top: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h3 {
+            color: #455a64;
+            margin-top: 1.5rem;
+        }
+
+        .diagram-container {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .diagram-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .diagram-container img:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .diagram-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .explanation {
+            background: #fdfbf7;
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .code-section {
+            display: none;
+            background: #272822;
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 1rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+        }
+
+        .btn-toggle {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .btn-toggle:hover {
+            background-color: #2980b9;
+        }
+
+        /* Modal for images */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            overflow: auto;
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            object-fit: contain;
+            animation: zoom 0.3s;
+            margin-top: 2%;
+        }
+
+        @keyframes zoom {
+            from {transform:scale(0.9)} 
+            to {transform:scale(1)}
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1.5rem; margin-top: 0; }
+            header { padding: 2rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Système de Réservation de Salles</h1>
+        <p>Document de Conception et Modélisation UML</p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">Auteur : Mbolamamy Sergio Randriamihoatra | L3 MISA</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- SECTION 1: CLASSES -->
+        <h2>
+            1. Diagramme de Classes
+        </h2>
+        
+        <div class="explanation">
+            <p>L'architecture s'articule autour de trois catégories principales de données définies dans le cahier des charges :</p>
+            <ul>
+                <li><strong>Classe Abstraite Utilisateur :</strong> Centralise les attributs et méthodes communs (nom, email, mot de passe, rôle). Elle gère la connexion, la consultation du planning et la recherche de salles.</li>
+                <li><strong>Classes Héritées (Acteurs) :</strong> 
+                    <ul>
+                        <li><em>Enseignant :</em> Réservation directe sans validation tierce.</li>
+                        <li><em>Étudiant :</em> Soumission d'une demande motivée soumise à validation.</li>
+                        <li><em>Agent Logistique :</em> Validation ou refus des demandes.</li>
+                        <li><em>Administrateur :</em> Gestion globale du parc et des utilisateurs.</li>
+                    </ul>
+                </li>
+                <li><strong>Salle :</strong> Représente l'infrastructure physique (capacité, vidéoprojecteur) et vérifie la disponibilité.</li>
+                <li><strong>Réservation :</strong> Entité centrale reliant une salle et un utilisateur, gérant les statuts (En attente, Validée, Refusée) et les notifications e-mail.</li>
+            </ul>
+        </div>
+
+        <div class="diagram-container">
+            <img src="classe.png" alt="Diagramme de Classes" onclick="openModal(this)">
+            <div class="diagram-caption">Cliquez sur l'image pour agrandir</div>
+        </div>
+
+        <!-- SECTION 2: CAS D'UTILISATION -->
+        <h2>2. Diagramme de Cas d'Utilisation</h2>
+        
+        <div class="explanation">
+            <p>Ce diagramme synthétise les interactions entre les quatre acteurs identifiés (Enseignant, Étudiant / Responsable d'Association, Agent Logistique, Administrateur) et le système.</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Acteur</th>
+                    <th>Cas d'utilisation</th>
+                    <th>Relation transversale</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Enseignant</strong></td>
+                    <td>Se connecter, consulter planning, rechercher une salle, réserver directement, consulter/annuler ses réservations</td>
+                    <td><em>&laquo;include&raquo; Vérifier disponibilité</em></td>
+                </tr>
+                <tr>
+                    <td><strong>Étudiant</strong></td>
+                    <td>Se connecter, consulter planning, rechercher une salle, soumettre une demande, consulter/annuler une demande</td>
+                    <td><em>&laquo;include&raquo; Filtrer les salles</em></td>
+                </tr>
+                <tr>
+                    <td><strong>Agent Logistique</strong></td>
+                    <td>Se connecter, consulter demandes en attente, valider une demande, refuser une demande, consulter historique</td>
+                    <td><em>&laquo;include&raquo; Envoyer e-mail</em></td>
+                </tr>
+                <tr>
+                    <td><strong>Administrateur</strong></td>
+                    <td>Se connecter, gérer utilisateurs, gérer salles, gérer rôles, consulter statistiques, consulter toutes les réservations</td>
+                    <td><em>Aucune (cas autonomes)</em></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="diagram-container">
+            <img src="cas_dutilisation.png" alt="Diagramme de Classes" onclick="openModal(this)">
+            <div class="diagram-caption">Cliquez sur l'image pour agrandir</div>
+        </div>
+
+        <!-- SECTION 3: SEQUENCES -->
+        <h2>
+            3. Diagrammes de Séquence
+        </h2>
+
+        <h3>3.1. Scénario 1 — Réservation directe (Enseignant)</h3>
+        <div class="explanation">
+            <p>Ce scénario illustre le chemin "sans friction" garanti aux enseignants : recherche, vérification de disponibilité et confirmation immédiate, sans intervention de l'agent logistique.</p>
+        </div>
+        <div class="diagram-container">
+            <img src="sequence_reservation_directe.png" alt="Séquence - Réservation Directe" onclick="openModal(this)">
+            <div class="diagram-caption">Cliquez sur l'image pour agrandir</div>
+        </div>
+
+        <h3>3.2. Scénario 2 — Demande avec validation (Étudiant)</h3>
+        <div class="explanation">
+            <p>Ce scénario formalise le processus où la demande étudiante ne devient effective qu'après l'arbitrage explicite de l'agent logistique. Il inclut la notification automatique de confirmation ou de refus.</p>
+        </div>
+        <div class="diagram-container">
+            <img src="sequence_reservation_avec_validation.png" alt="Séquence - Validation" onclick="openModal(this)">
+            <div class="diagram-caption">Cliquez sur l'image pour agrandir</div>
+        </div>
+
+        <!-- SECTION 4: ETATS -->
+        <h2>4. Diagramme d'États (Cycle de vie d'une réservation)</h2>
+        
+        <div class="explanation">
+            <p>L'attribut statut de la classe <code>Reservation</code> définit un cycle de vie strict. Une demande passe de l'état initial <em>En attente</em> vers l'un des deux états terminaux, <em>Validée</em> ou <em>Refusée</em>, sans retour possible en arrière une fois la décision enregistrée.</p>
+            <p><em>Nota :</em> Pour une réservation créée directement par un enseignant, le statut est fixé à <em>VALIDEE</em> dès la création, excluant toute validation tierce.</p>
+        </div>
+
+        <div class="diagram-container">
+            <img src="etat.png" alt="Diagramme d'États" onclick="openModal(this)">
+            <div class="diagram-caption">Cliquez sur l'image pour agrandir</div>
+        </div>
+
+        <!-- SECTION 5: TRACABILITE -->
+        <h2>5. Synthèse et Traçabilité</h2>
+        
+        <div class="explanation">
+            <p>Matrice de couverture vérifiant que chaque besoin fonctionnel exprimé dans le cahier des charges trouve une traduction explicite dans les artefacts de conception.</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Besoin fonctionnel (Cahier des charges)</th>
+                    <th>Élément de conception correspondant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1. Consultation du planning en temps réel</td>
+                    <td><code>Utilisateur.consulterPlanning()</code> ; cas « Consulter planning »</td>
+                </tr>
+                <tr>
+                    <td>2. Filtrage par capacité et équipements</td>
+                    <td><code>Utilisateur.rechercherSalle()</code> ; cas « Rechercher une salle »</td>
+                </tr>
+                <tr>
+                    <td>3. Réservation directe enseignant</td>
+                    <td><code>Enseignant.reserverSalleDirectement()</code> ; scénario 4.1</td>
+                </tr>
+                <tr>
+                    <td>4. Demande motivée étudiant</td>
+                    <td><code>Etudiant.soumettreDemande()</code> ; scénario 4.2</td>
+                </tr>
+                <tr>
+                    <td>5. Validation/refus par la logistique</td>
+                    <td><code>AgentLogistique.validerDemande()</code> / <code>refuserDemande()</code></td>
+                </tr>
+                <tr>
+                    <td>6. Notification e-mail automatique</td>
+                    <td><code>Reservation.envoyerEmailConfirmation()</code> / <code>envoyerEmailRefus()</code></td>
+                </tr>
+                <tr>
+                    <td>Prévention des doubles réservations</td>
+                    <td><code>Reservation.bloquerDoubleReservation()</code> ; <code>Salle.verifierDisponibilite()</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- The Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <script>
+        // Toggle code visibility
+        function toggleCode(id) {
+            var el = document.getElementById(id);
+            if (el.style.display === "none" || el.style.display === "") {
+                el.style.display = "block";
+            } else {
+                el.style.display = "none";
+            }
+        }
+
+        // Image Modal Logic
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("modalImg");
+
+        function openModal(element) {
+            modal.style.display = "block";
+            modalImg.src = element.src;
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        // Close modal when clicking outside the image
+        modal.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
